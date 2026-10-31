@@ -5,15 +5,20 @@ Aplicación web para registrar, asignar y dar seguimiento a incidentes de TI, co
 **Stack:** React + Vite · Node.js/Express · PostgreSQL · Docker · Azure Pipelines + GitHub Actions.
 
 ## Requisitos
-Node 20+, Docker (para PostgreSQL) y Git.
+Docker Desktop con Docker Compose.
 
 ## Instalación y ejecución
 ```bash
-cp .env.example .env            # edite la contraseña
-docker compose up -d db         # crea esquema y datos de ejemplo
-cd backend && npm ci && DATABASE_URL=$(grep ^DATABASE_URL ../.env | cut -d= -f2-) npm run dev
-cd frontend && npm ci && npm run dev    # http://localhost:5173
+docker compose up --build
 ```
+Abre `http://localhost:5173` para usar la aplicación. La API está disponible en
+`http://localhost:3000/api/health`. Para detener los servicios, usa `Ctrl+C` y
+ejecuta `docker compose down`; los datos se conservan para la próxima ejecución.
+
+Los puertos se pueden cambiar con `FRONTEND_PORT`, `API_PORT` y `DB_PORT`. Para
+personalizar las credenciales locales, define `POSTGRES_USER`, `POSTGRES_PASSWORD`
+y `POSTGRES_DB` en un archivo `.env`.
+
 Pruebas: `cd backend && npm test` · Lint: `npm run lint`.
 
 ## API
@@ -33,3 +38,11 @@ Estados: NUEVO → ASIGNADO → EN_PROCESO → RESUELTO → CERRADO.
 
 ## Documentación
 Ver `docs/`: arquitectura, branching, deuda técnica, seguridad, dependencias, release, evidencias.
+
+## Flujo de trabajo
+
+- `main` se mantiene estable; no se trabaja directamente en ella.
+- Ramas de trabajo: `feature/*`, `fix/*`, `refactor/*`.
+- Cada commit y Pull Request referencia un work item de Azure Boards con `AB#11`.
+- Todo cambio entra a `main` mediante Pull Request con al menos una revisión.
+- Los secretos (tokens, claves, contraseñas) nunca se guardan en el repositorio; se usan variables o secretos protegidos.
